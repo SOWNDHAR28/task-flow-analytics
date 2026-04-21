@@ -1,0 +1,117 @@
+======================================================
+ TASKFLOW - FRONTEND DOCUMENTATION & DEVELOPER GUIDE
+======================================================
+
+Welcome to the TaskFlow frontend documentation! This guide will help you understand the codebase, run the application, and add new features easily.
+
+------------------------------------------------------
+ 1. HOW TO RUN THE APPLICATION
+------------------------------------------------------
+
+Prerequisites:
+- Node.js installed on your machine.
+
+Steps to Run Locally:
+1. Open your terminal and navigate to the project directory:
+   cd path/to/"Task Tracking"
+
+2. Install the necessary dependencies (only needed the first time or if dependencies change):
+   npm install
+
+3. Start the Vite development server:
+   npm run dev
+
+4. Open your browser and go to the URL provided in the terminal (usually http://localhost:5173).
+
+Note: The app relies on a backend API. Ensure your backend is running, or the app will use dummy data or fail API calls. The base URL is configured in the `.env` file (VITE_API_BASE_URL).
+
+------------------------------------------------------
+ 2. PROJECT STRUCTURE (WHAT FILE IS FOR WHAT?)
+------------------------------------------------------
+
+The project follows a standard React + Vite structure. Here is a breakdown of the key directories and files:
+
+project-root/
+│
+├── .env                  # Environment variables (e.g., API Base URL).
+├── index.html            # The main HTML file where the React app is injected.
+├── tailwind.config.js    # Tailwind CSS configuration (colors, fonts, animations).
+├── vite.config.js        # Vite bundler configuration.
+├── package.json          # Project dependencies and npm scripts.
+│
+└── src/                  # All your application source code lives here.
+    ├── App.jsx           # The root React component. Sets up routing & global providers.
+    ├── main.jsx          # The entry point that mounts App.jsx to the DOM.
+    ├── index.css         # Global CSS file containing Tailwind directives and custom styles.
+    ├── routes.jsx        # Defines all page routes and handles protected routing logic.
+    │
+    ├── components/       # Reusable UI building blocks used across multiple pages.
+    │   ├── Loader.jsx    # Loading spinner component.
+    │   ├── Modal.jsx     # Reusable popup modal wrapper.
+    │   ├── Navbar.jsx    # The side navigation bar.
+    │   ├── ProtectedRoute.jsx # Wrapper component to redirect unauthenticated users to /login.
+    │   ├── TaskCard.jsx  # Card displaying individual task details.
+    │   └── TaskModal.jsx # The form modal used to add or edit tasks.
+    │
+    ├── context/          # Global state management using React Context.
+    │   └── AuthContext.jsx # Manages user authentication state, login, and logout functions.
+    │
+    ├── hooks/            # Custom React hooks.
+    │   └── useAuth.js    # Easy-to-use hook to access the AuthContext anywhere.
+    │
+    ├── pages/            # Full-screen views mapped to specific routes.
+    │   ├── Dashboard.jsx # The main overview with stats, charts, and recent tasks.
+    │   ├── Login.jsx     # The authentication screen.
+    │   ├── Profile.jsx   # User settings and productivity score view.
+    │   ├── Reports.jsx   # Detailed analytics and charts (Weekly/Monthly).
+    │   └── Tasks.jsx     # The main list view to manage (CRUD) all tasks.
+    │
+    ├── services/         # Logic for communicating with the backend API.
+    │   ├── api.js        # Configures Axios (base URL, auth token headers).
+    │   ├── authService.js # API calls for login/signup/profile.
+    │   ├── reportService.js # API calls for fetching report data.
+    │   └── taskService.js # API calls for creating, updating, and deleting tasks.
+    │
+    └── utils/            # Helper functions used throughout the app.
+        └── formatDate.js # Functions for formatting dates, calculating status colors, etc.
+
+
+------------------------------------------------------
+ 3. HOW TO ADD OR ALTER FEATURES
+------------------------------------------------------
+
+A. Adding a New Page (e.g., "Settings Page")
+1. Create the Component: Create `Settings.jsx` inside the `src/pages/` folder.
+2. Add the Route: Open `src/routes.jsx`. Import your new component and add a `<Route>` inside the `<AppRoutes>` block. For example:
+   <Route path="/settings" element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
+3. Update Navigation: Open `src/components/Navbar.jsx`. Add a new object to the `navItems` array with `to: '/settings'`, a `label`, and an SVG `icon`.
+
+B. Creating a New Reusable Component (e.g., "CustomButton")
+1. Create `CustomButton.jsx` in the `src/components/` folder.
+2. Write your component logic and styles using Tailwind CSS.
+3. Import and use `<CustomButton />` wherever needed in your pages.
+
+C. Adding a New API Call
+1. Open the relevant file in `src/services/` (or create a new one, e.g., `notificationService.js`).
+2. Add your function using the configured Axios instance:
+   export const getNotifications = () => api.get('/notifications/');
+3. Import this service function in your component/page and call it inside a `useEffect` or an event handler (like an `onClick`).
+
+D. Changing Styles and Theming
+- Colors & Fonts: Open `tailwind.config.js`. You can modify the `theme.extend.colors` block to change the primary brand colors.
+- Global Styles: Open `src/index.css`. You can modify base element styles or update the custom `@layer components` classes (like `.card`, `.btn-primary`) which apply across the whole app.
+
+E. Modifying Global State
+If you need a piece of state available everywhere (like a dark mode toggle or user preferences), the pattern used in `AuthContext.jsx` is recommended:
+1. Create a new Context in `src/context/ThemeContext.jsx`.
+2. Provide the state in `App.jsx` by wrapping your app: `<ThemeProvider><AppRoutes /></ThemeProvider>`.
+
+------------------------------------------------------
+ NEED MORE HELP?
+------------------------------------------------------
+- React Docs: https://react.dev/
+- Tailwind CSS Docs: https://tailwindcss.com/docs
+- Vite Docs: https://vitejs.dev/
+- Recharts Docs: https://recharts.org/
+
+Happy coding!
