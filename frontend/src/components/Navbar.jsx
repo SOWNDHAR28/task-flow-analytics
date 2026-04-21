@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const navItems = [
@@ -85,31 +85,37 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 glass flex flex-col z-40 border-r border-surface-border">
+    <aside className="w-64 h-screen sticky top-0 flex flex-col border-r border-surface-border">
       <div className="px-6 py-6 border-b border-surface-border">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-brand flex items-center justify-center shadow-glow">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
+        <Link
+          to="/dashboard"
+          className="px-6 py-6 border-b border-surface-border block"
+        >
+          <div className="flex items-center gap-3 cursor-pointer group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-brand flex items-center justify-center shadow-glow group-hover:scale-105 transition">
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+
+            <div>
+              <p className="text-white font-bold text-sm leading-tight group-hover:text-brand-400 transition">
+                TaskFlow
+              </p>
+              <p className="text-gray-500 text-xs">Analytics</p>
+            </div>
           </div>
-          <div>
-            <p className="text-white font-bold text-sm leading-tight">
-              TaskFlow
-            </p>
-            <p className="text-gray-500 text-xs">Analytics</p>
-          </div>
-        </div>
+        </Link>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-thin">

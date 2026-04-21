@@ -12,7 +12,7 @@ import { getWeeklyReport, getMonthlyReport } from "../services/reportService";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 
-// 🔥 Custom Tooltip ONLY (no default grey one)
+// 🔥 Custom Tooltip ONLY
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
@@ -30,11 +30,23 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-function SummaryCard({ label, value }) {
+// ✅ UPDATED SUMMARY CARD (Dashboard style)
+function SummaryCard({ label, value, icon, color }) {
   return (
-    <div className="card text-center">
-      <p className="text-3xl font-bold">{value}</p>
-      <p className="text-gray-400">{label}</p>
+    <div className="card px-3 py-3 flex items-center justify-between">
+      {/* LEFT */}
+      <div className="flex items-center gap-2 min-w-0">
+        <div
+          className={`w-8 h-8 rounded-lg flex items-center justify-center ${color} bg-opacity-20`}
+        >
+          {icon}
+        </div>
+
+        <p className="text-gray-400 text-xs font-medium truncate">{label}</p>
+      </div>
+
+      {/* RIGHT */}
+      <p className="text-lg font-bold text-white shrink-0">{value}</p>
     </div>
   );
 }
@@ -71,7 +83,7 @@ export default function Reports() {
   const completedTasks = report?.completed_tasks || 0;
   const completionRate = report?.completion_rate || 0;
 
-  // 🔥 NEW: Dynamic chart data from backend
+  // CHART DATA
   const chartData =
     period === "weekly"
       ? report?.daily?.map((d) => ({
@@ -115,11 +127,76 @@ export default function Reports() {
         <Loader text="Loading report..." />
       ) : (
         <>
-          {/* SUMMARY */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <SummaryCard label="Total Tasks" value={totalTasks} />
-            <SummaryCard label="Completed" value={completedTasks} />
-            <SummaryCard label="Completion %" value={`${completionRate}%`} />
+          {/* 🔥 SUMMARY (FIXED — ALWAYS ONE ROW) */}
+          <div className="flex gap-3 mb-6 overflow-x-auto">
+            <div className="flex-1 min-w-[160px]">
+              <SummaryCard
+                label="Total Tasks"
+                value={totalTasks}
+                color="bg-brand-500"
+                icon={
+                  <svg
+                    className="w-5 h-5 text-brand-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"
+                    />
+                  </svg>
+                }
+              />
+            </div>
+
+            <div className="flex-1 min-w-[160px]">
+              <SummaryCard
+                label="Completed"
+                value={completedTasks}
+                color="bg-emerald-500"
+                icon={
+                  <svg
+                    className="w-5 h-5 text-emerald-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 12l2 2 4-4"
+                    />
+                  </svg>
+                }
+              />
+            </div>
+
+            <div className="flex-1 min-w-[160px]">
+              <SummaryCard
+                label="Completion %"
+                value={`${completionRate}%`}
+                color="bg-violet-500"
+                icon={
+                  <svg
+                    className="w-5 h-5 text-violet-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13 7h8m0 0v8m0-8l-8 8"
+                    />
+                  </svg>
+                }
+              />
+            </div>
           </div>
 
           {/* CHART */}
@@ -137,10 +214,9 @@ export default function Reports() {
 
                 <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
 
-                {/* ✅ ONLY CUSTOM TOOLTIP */}
                 <Tooltip
                   content={<CustomTooltip />}
-                  cursor={{ fill: "transparent" }} // removes grey hover box
+                  cursor={{ fill: "transparent" }}
                 />
 
                 <Bar

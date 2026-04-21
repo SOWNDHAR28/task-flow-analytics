@@ -1,9 +1,26 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import * as taskService from "../services/taskService";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
+
+// ✅ Reusable Stat Card (same as Dashboard & Reports)
+function StatCard({ title, value, icon, color }) {
+  return (
+    <div className="card px-3 py-3 flex items-center justify-between">
+      <div className="flex items-center gap-2 min-w-0">
+        <div
+          className={`w-8 h-8 rounded-lg flex items-center justify-center ${color} bg-opacity-20`}
+        >
+          {icon}
+        </div>
+
+        <p className="text-gray-400 text-xs font-medium truncate">{title}</p>
+      </div>
+
+      <p className="text-lg font-bold text-white shrink-0">{value}</p>
+    </div>
+  );
+}
 
 function InfoRow({ label, value, icon }) {
   return (
@@ -22,8 +39,8 @@ function InfoRow({ label, value, icon }) {
 }
 
 export default function Profile() {
-  const { user, handleLogout , updateUser } = useAuth();
-  const navigate = useNavigate();
+  const { user, handleLogout, updateUser } = useAuth();
+
   const [tasks, setTasks] = useState([]);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
@@ -36,20 +53,22 @@ export default function Profile() {
       .catch(() => {});
   }, []);
 
+  // 📊 Stats
   const total = tasks.length;
   const completed = tasks.filter((t) => t.status === "completed").length;
   const partial = tasks.filter((t) => t.status === "partial").length;
   const pending = tasks.filter((t) => t.status === "pending").length;
+
   const score = total
     ? Math.round(((completed + partial * 0.5) / total) * 100)
     : 0;
-
 
   const handleSaveName = async () => {
     if (!name.trim()) {
       toast.error("Name cannot be empty");
       return;
     }
+
     setSaving(true);
     setTimeout(() => {
       updateUser({ name: name.trim() });
@@ -68,7 +87,8 @@ export default function Profile() {
     : "N/A";
 
   return (
-    <div className="animate-fade-in max-w-2xl mx-auto">
+    <div className="animate-fade-in max-w-3xl mx-auto">
+      {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Profile</h1>
         <p className="text-gray-400 mt-1">
@@ -76,73 +96,78 @@ export default function Profile() {
         </p>
       </div>
 
+      {/* PROFILE CARD */}
       <div className="card mb-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          {/* AVATAR */}
           <div className="relative flex-shrink-0">
             <div className="w-24 h-24 rounded-2xl bg-gradient-brand flex items-center justify-center text-white text-4xl font-bold shadow-glow">
               {user?.name?.[0]?.toUpperCase() || "U"}
             </div>
+
+            {/* ONLINE DOT */}
             <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-surface-card" />
           </div>
+
+          {/* USER INFO */}
           <div className="flex-1 text-center sm:text-left">
+            {/* EDIT MODE */}
             {editing ? (
               <div className="flex items-center gap-3 mb-1">
                 <input
-                  id="profile-name-input"
                   className="input-field py-2 text-lg font-semibold"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  autoFocus
                 />
-                <button
-                  onClick={handleSaveName}
-                  disabled={saving}
-                  className="btn-primary py-2 px-4 whitespace-nowrap"
-                >
+
+                <button onClick={handleSaveName} className="btn-primary">
                   {saving ? "Saving..." : "Save"}
                 </button>
+
                 <button
                   onClick={() => {
                     setEditing(false);
                     setName(user?.name || "");
                   }}
-                  className="btn-secondary py-2 px-3"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-center sm:justify-start gap-3 mb-1">
-                <h2 className="text-2xl font-bold text-white">
-                  {user?.name || "User"}
-                </h2>
+              <div className="flex items-center gap-3 mb-1 justify-center sm:justify-start">
+                <h2 className="text-2xl font-bold text-white">{user?.name}</h2>
+
                 <button
-                  id="edit-profile-btn"
                   onClick={() => setEditing(true)}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-brand-400 hover:bg-brand-500/15 transition-all"
+                  className="text-gray-400 hover:text-brand-400"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
+                  ✏️
                 </button>
               </div>
             )}
+
             <p className="text-gray-400">{user?.email}</p>
-            <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/15 text-brand-400 border border-brand-500/25">
+
+            {/* 🔥 BADGES */}
+            <div className="flex items-center gap-2 mt-3 justify-center sm:justify-start">
+              <span
+                className="px-3 py-1 rounded-full text-xs font-semibold 
+                bg-brand-500/15 text-brand-400 border border-brand-500/25"
+              >
                 Active Member
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold border
+                ${
+                  score >= 70
+                    ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
+                    : score >= 40
+                      ? "bg-amber-500/15 text-amber-400 border-amber-500/25"
+                      : "bg-red-500/15 text-red-400 border-red-500/25"
+                }`}
+              >
                 {score >= 70
                   ? "High Performer"
                   : score >= 40
@@ -154,153 +179,71 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        {[
-          {
-            label: "Total Tasks",
-            value: total,
-            color: "text-brand-400",
-            bg: "bg-brand-500/10",
-          },
-          {
-            label: "Completed",
-            value: completed,
-            color: "text-emerald-400",
-            bg: "bg-emerald-500/10",
-          },
-          {
-            label: "Pending",
-            value: pending,
-            color: "text-red-400",
-            bg: "bg-red-500/10",
-          },
-          {
-            label: "Partial",
-            value: partial,
-            color: "text-amber-400",
-            bg: "bg-amber-500/10",
-          },
-        ].map(({ label, value, color, bg }) => (
-          <div
-            key={label}
-            className={`card text-center py-4 ${bg} border-transparent`}
-          >
-            <p className={`text-2xl font-bold ${color}`}>{value}</p>
-            <p className="text-gray-400 text-xs mt-0.5">{label}</p>
-          </div>
-        ))}
+      {/* 🔥 STATS ROW (NO WRAP) */}
+      <div className="flex gap-3 mb-6 overflow-x-auto">
+        <div className="flex-1 min-w-[140px]">
+          <StatCard
+            title="Total"
+            value={total}
+            color="bg-brand-500"
+            icon={<span>📊</span>}
+          />
+        </div>
+
+        <div className="flex-1 min-w-[140px]">
+          <StatCard
+            title="Completed"
+            value={completed}
+            color="bg-emerald-500"
+            icon={<span>✔</span>}
+          />
+        </div>
+
+        <div className="flex-1 min-w-[140px]">
+          <StatCard
+            title="Pending"
+            value={pending}
+            color="bg-red-500"
+            icon={<span>⏳</span>}
+          />
+        </div>
+
+        <div className="flex-1 min-w-[140px]">
+          <StatCard
+            title="Partial"
+            value={partial}
+            color="bg-amber-500"
+            icon={<span>⚡</span>}
+          />
+        </div>
       </div>
 
+      {/* SCORE */}
       <div className="card mb-6">
         <h3 className="text-white font-semibold mb-2">Productivity Score</h3>
-        <p className="text-gray-500 text-sm mb-4">
-          Weighted score: completed tasks × 1, partial × 0.5
-        </p>
+
         <div className="flex items-center gap-4">
           <div className="flex-1 h-3 rounded-full bg-surface-border overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-brand transition-all duration-700"
+              className="h-full bg-gradient-brand"
               style={{ width: `${score}%` }}
             />
           </div>
-          <span className="text-white font-bold text-xl w-16 text-right">
-            {score}%
-          </span>
+
+          <span className="text-white font-bold">{score}%</span>
         </div>
-        <p className="text-gray-500 text-xs mt-3">
-          {score >= 80
-            ? "🏆 Outstanding! You're a productivity champion."
-            : score >= 60
-              ? "✅ Great work! Keep up the momentum."
-              : score >= 40
-                ? "📈 Good progress. Push a little harder!"
-                : "🔥 Just starting out — every task counts!"}
-        </p>
       </div>
 
+      {/* DETAILS */}
       <div className="card mb-6">
-        <h3 className="text-white font-semibold mb-1">Account Details</h3>
-        <p className="text-gray-500 text-sm mb-4">Your profile information</p>
-        <InfoRow
-          label="Full Name"
-          value={user?.name}
-          icon={
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          }
-        />
-        <InfoRow
-          label="Email Address"
-          value={user?.email}
-          icon={
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          }
-        />
-        <InfoRow
-          label="Member Since"
-          value={joinDate}
-          icon={
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          }
-        />
+        <InfoRow label="Full Name" value={user?.name} icon={<span>👤</span>} />
+        <InfoRow label="Email" value={user?.email} icon={<span>📧</span>} />
+        <InfoRow label="Member Since" value={joinDate} icon={<span>📅</span>} />
       </div>
 
-      <button
-        id="logout-btn"
-        onClick={handleLogout}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold
-          bg-red-500/10 text-red-400 border border-red-500/20
-          hover:bg-red-500/20 hover:border-red-500/40 transition-all duration-150"
-      >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-          />
-        </svg>
-        Sign Out
+      {/* LOGOUT */}
+      <button onClick={handleLogout} className="w-full btn-danger">
+        Logout
       </button>
     </div>
   );

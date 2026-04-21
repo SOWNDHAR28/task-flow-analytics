@@ -25,26 +25,22 @@ const DUMMY_CHART = [
   { day: "Sun", completed: 5, pending: 3 },
 ];
 
-function StatCard({ title, value, icon, color, sub }) {
+function StatCard({ title, value, icon, color }) {
   return (
-    <div className="stat-card">
-      <div
-        className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-10 ${color}`}
-      />
-      <div className="flex items-center justify-between">
+    <div className="card p-4 flex items-center justify-between">
+      {/* LEFT SIDE */}
+      <div className="flex items-center gap-3">
         <div
           className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} bg-opacity-20`}
         >
           {icon}
         </div>
-        {sub !== undefined && (
-          <span className="text-xs text-gray-500 font-medium">{sub}</span>
-        )}
-      </div>
-      <div>
+
         <p className="text-gray-400 text-sm font-medium">{title}</p>
-        <p className="text-3xl font-bold text-white mt-0.5">{value}</p>
       </div>
+
+      {/* RIGHT SIDE */}
+      <p className="text-2xl font-bold text-white">{value}</p>
     </div>
   );
 }
@@ -114,12 +110,11 @@ export default function Dashboard() {
         <Loader text="Loading dashboard..." />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
             <StatCard
               title="Total Tasks"
               value={total}
               color="bg-brand-500"
-              sub="All time"
               icon={
                 <svg
                   className="w-5 h-5 text-brand-400"
@@ -131,16 +126,16 @@ export default function Dashboard() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"
                   />
                 </svg>
               }
             />
+
             <StatCard
-              title="Completed"
+              title="Completed Tasks"
               value={completed}
               color="bg-emerald-500"
-              sub="Done"
               icon={
                 <svg
                   className="w-5 h-5 text-emerald-400"
@@ -152,16 +147,16 @@ export default function Dashboard() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    d="M9 12l2 2 4-4"
                   />
                 </svg>
               }
             />
+
             <StatCard
-              title="Pending"
+              title="Pending Tasks"
               value={pending}
               color="bg-red-500"
-              sub="Active"
               icon={
                 <svg
                   className="w-5 h-5 text-red-400"
@@ -173,16 +168,16 @@ export default function Dashboard() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    d="M12 8v4l3 3"
                   />
                 </svg>
               }
             />
+
             <StatCard
               title="Completion Rate"
               value={`${rate}%`}
               color="bg-violet-500"
-              sub={rate >= 70 ? "🎯 Great" : "📈 Keep going"}
               icon={
                 <svg
                   className="w-5 h-5 text-violet-400"
@@ -194,7 +189,7 @@ export default function Dashboard() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    d="M13 7h8m0 0v8m0-8l-8 8"
                   />
                 </svg>
               }
@@ -282,92 +277,114 @@ export default function Dashboard() {
                 </span>
               </div>
             </div>
-
+            {/*productivity score*/}
             <div className="card">
-              <h2 className="text-white font-semibold mb-2">
+              <h2 className="text-white font-semibold mb-1">
                 Productivity Score
               </h2>
-              <p className="text-gray-500 text-sm mb-6">
+              <p className="text-gray-500 text-sm mb-4">
                 Based on your completion rate
               </p>
-              <div className="flex flex-col items-center justify-center py-4">
-                <div className="relative w-32 h-32">
-                  <svg
-                    viewBox="0 0 100 100"
-                    className="rotate-[-90deg] w-full h-full"
-                  >
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      fill="none"
-                      stroke="#2a2d3e"
-                      strokeWidth="10"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      fill="none"
-                      stroke="url(#scoreGrad)"
-                      strokeWidth="10"
-                      strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 40}`}
-                      strokeDashoffset={`${2 * Math.PI * 40 * (1 - rate / 100)}`}
-                      className="transition-all duration-700"
-                    />
-                    <defs>
-                      <linearGradient
-                        id="scoreGrad"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="0%"
-                      >
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#8b5cf6" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center rotate-0">
-                    <span className="text-3xl font-bold text-white">
-                      {rate}
-                    </span>
-                    <span className="text-gray-500 text-xs">/ 100</span>
+
+              {/* MAIN LAYOUT */}
+              <div className="flex items-center">
+                {/* LEFT → 60% */}
+                <div className="w-3/5 flex flex-col items-center justify-center">
+                  {/* BIGGER CIRCLE */}
+                  <div className="relative w-44 h-44">
+                    <svg
+                      viewBox="0 0 100 100"
+                      className="rotate-[-90deg] w-full h-full"
+                    >
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="none"
+                        stroke="#2a2d3e"
+                        strokeWidth="10"
+                      />
+
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="none"
+                        stroke="url(#scoreGrad)"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 40}`}
+                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - rate / 100)}`}
+                        className="transition-all duration-700"
+                      />
+
+                      <defs>
+                        <linearGradient
+                          id="scoreGrad"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="0%"
+                        >
+                          <stop offset="0%" stopColor="#6366f1" />
+                          <stop offset="100%" stopColor="#8b5cf6" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+
+                    {/* CENTER TEXT */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-4xl font-bold text-white">
+                        {rate}
+                      </span>
+                      <span className="text-gray-500 text-sm">/100</span>
+                    </div>
                   </div>
+
+                  {/* MESSAGE BELOW */}
+                  <p className="text-gray-400 text-sm mt-4 text-center">
+                    {rate >= 80
+                      ? "🏆 Excellent work!"
+                      : rate >= 60
+                        ? "✅ Good progress"
+                        : rate >= 40
+                          ? "📈 Keep pushing"
+                          : "🔥 Just getting started"}
+                  </p>
                 </div>
-                <p className="text-gray-400 text-sm mt-4 text-center">
-                  {rate >= 80
-                    ? "🏆 Excellent work!"
-                    : rate >= 60
-                      ? "✅ Good progress"
-                      : rate >= 40
-                        ? "📈 Keep pushing"
-                        : "🔥 Just getting started"}
-                </p>
-              </div>
-              <div className="mt-4 space-y-2">
-                {[
-                  {
-                    label: "Completed",
-                    val: completed,
-                    color: "bg-emerald-500",
-                  },
-                  { label: "Pending", val: pending, color: "bg-red-500" },
-                  {
-                    label: "Partial",
-                    val: total - completed - pending,
-                    color: "bg-amber-500",
-                  },
-                ].map(({ label, val, color }) => (
-                  <div key={label} className="flex items-center gap-3 text-sm">
-                    <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
-                    <span className="text-gray-400 flex-1">{label}</span>
-                    <span className="text-white font-medium">{val}</span>
-                  </div>
-                ))}
+
+                {/* RIGHT → 40% */}
+                <div className="w-1/3 space-y-4">
+                  {[
+                    {
+                      label: "Completed",
+                      val: completed,
+                      color: "bg-emerald-500",
+                    },
+                    { label: "Pending", val: pending, color: "bg-red-500" },
+                    {
+                      label: "Partial",
+                      val: total - completed - pending,
+                      color: "bg-amber-500",
+                    },
+                  ].map(({ label, val, color }) => (
+                    <div key={label} className="flex items-baseline text-sm">
+                      {/* LEFT TEXT */}
+                      <div className="flex items-center gap-4 text-gray-400">
+                        <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
+                        <span>{label}</span>
+                      </div>
+
+                      {/* RIGHT VALUE (tight alignment) */}
+                      <span className="ml-auto text-white font-semibold">
+                        {val}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+            {/*productivity score*/}
           </div>
 
           <div className="card">

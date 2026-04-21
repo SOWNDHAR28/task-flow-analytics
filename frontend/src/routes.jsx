@@ -13,7 +13,7 @@ function AppLayout({ children }) {
     <div className="flex min-h-screen">
       <Navbar />
 
-      <main className="flex-1 ml-64 p-8 bg-gray-900 min-h-screen">
+      <main className="flex-1 p-8 overflow-y-auto bg-background">
         {children}
       </main>
     </div>
